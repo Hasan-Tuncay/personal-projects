@@ -1,0 +1,138 @@
+import jdk.jfr.Label
+import java.util.*
+import java.math.BigDecimal
+
+fun fromBigDecimalConvert(_big_decimal : BigDecimal, _target : String): String{
+    val list = mutableListOf<Char>('0','1','2','3','4','5','6','7','8','9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        'J', 'K', 'L', 'M', 'N', 'O', 'P','Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
+    var big_Decimal = _big_decimal
+    val target = _target.toBigDecimal()
+    var mutableList = mutableListOf<String>()
+    var quotient: BigDecimal
+    var remainder: BigDecimal
+    var value: Char
+    while (true) {
+        remainder =  big_Decimal.remainder(target)
+        //  println(remainder)
+        value = list[remainder.intValueExact()]
+        mutableList.add(value.toString())
+        quotient = big_Decimal.subtract(remainder).divide(target)
+        // println(quotient)
+        big_Decimal = quotient
+        if(quotient < target) {
+            value = list[quotient.intValueExact()]
+            mutableList.add(value.toString())
+            if(mutableList.last()=="0") {
+                mutableList.removeAt(1)
+            }
+
+            break
+        }
+    }
+    return mutableList.joinToString("").reversed()
+}
+
+fun toBigDecimalConvert(_source :String , _processedNumber : String): BigDecimal {
+    val list = mutableListOf<Char>(
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    )
+    val source = _source.toBigDecimal()
+    val processedNumber = _processedNumber.uppercase().reversed()
+    var sum = BigDecimal.ZERO
+
+    var i= 0
+    while (i in processedNumber.indices){
+        val char = processedNumber[i]
+        val valueChar = list.indexOf(char)
+        val to_big_decimal = source.pow(i).multiply(valueChar.toBigDecimal())
+        sum += to_big_decimal
+        if (i == processedNumber.lastIndex) {
+            sum
+            break
+        }
+        i++
+    }
+    /**  for (i in processedNumber.indices) {
+    val char = processedNumber[i]
+    val valueChar = list.indexOf(char)
+    val to_big_decimal = source.pow(i).multiply(valueChar.toBigDecimal())
+    sum += to_big_decimal
+    if (i == processedNumber.lastIndex) {
+
+    println(sum)
+    break
+    }
+    }  */
+
+    return sum
+}
+
+
+fun converter() {
+    Loop@while (true) {
+        println("Enter two numbers in format: {source base} {target base} (To quit type /exit)")
+        val scanner = Scanner(System.`in`)
+        val input = scanner.nextLine()
+        val source = input.substringBefore(" ")
+        val target = input.substringAfter(" ")
+
+        if(input.equals("exit")){
+            break
+        } else {
+            while(true){
+                println("Enter number in base $source to convert to base $target (To go back type /back)")
+                val number = scanner.nextLine()
+                if (number=="back"){
+                    break}
+                println("Conversion result: ${fromBigDecimalConvert(toBigDecimalConvert(source, number), target)}")
+            }
+        }
+    }
+}
+
+
+
+fun main() {
+
+    converter()
+
+}
+
+/**Your program should have a two-level menu:
+On the first level, the user sees the following prompt: Enter two numbers in format: {source base} {target base} (To quit type /exit).
+Then, they input two numbers separated by a single space: source base and target base.
+The user also has the option to use the /exit command to quit the program.
+On the second level, the user sees another prompt:
+Enter number in base {user source base} to convert to base {user target base} (To go back type /back),
+and inputs the number in the source base. The program outputs the message Conversion result: followed by the number in the target base. Then, the program asks for the new number to convert from the previously provided source base to the target base.
+To change the bases, the user can choose the BACK command and return to the first level menu to make the necessary changes.
+        */
+/**Enter two numbers in format: {source base} {target base} (To quit type /exit) > 10 2
+Enter number in base 10 to convert to base 2 (To go back type /back) > 11
+Conversion result: 1011
+
+Enter number in base 10 to convert to base 2 (To go back type /back) > 18
+Conversion result: 10010
+
+Enter number in base 10 to convert to base 2 (To go back type /back) > 127
+Conversion result: 1111111
+
+Enter number in base 10 to convert to base 2 (To go back type /back) > 189344562689000108753301247
+Conversion result: 1001110010011111010001010100111110001111101101011010101101001001111110100010111011111111
+
+Enter number in base 10 to convert to base 2 (To go back type /back) > /back
+
+Enter two numbers in format: {source base} {target base} (To quit type /exit) > 36 10
+Enter number in base 36 to convert to base 10 (To go back type /back) > abcde
+Conversion result: 17325410
+
+Enter number in base 36 to convert to base 10 (To go back type /back) > 13a0
+Conversion result: 50904
+
+Enter number in base 36 to convert to base 10 (To go back type /back) > az
+Conversion result: 395
+
+Enter number in base 36 to convert to base 10 (To go back type /back) > /back
+
+Enter two numbers in format: {source base} {target base} (To quit type /exit) > /exit*/

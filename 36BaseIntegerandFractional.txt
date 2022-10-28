@@ -1,0 +1,192 @@
+package converter // Do not delete this line
+import jdk.jfr.Label
+
+import java.util.*
+import java.math.BigDecimal
+import java.math.BigInteger
+import java.math.RoundingMode
+
+
+fun fromBigIntegerToBaseConvert(_big_decimal : String, _target : String): String{
+    val list = mutableListOf<Char>('0','1','2','3','4','5','6','7','8','9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        'J', 'K', 'L', 'M', 'N', 'O', 'P','Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
+    var big_Decimal = _big_decimal.toBigDecimal()
+    val target = _target.toBigDecimal()
+    var mutableList = mutableListOf<String>()
+    var quotient: BigDecimal
+    var remainder: BigDecimal
+    var value: Char
+    while (true) {
+        remainder =  big_Decimal.remainder(target)
+        //  println(remainder)
+        value = list[remainder.intValueExact()]
+        mutableList.add(value.toString())
+        quotient = big_Decimal.subtract(remainder).divide(target)
+        // println(quotient)
+        big_Decimal = quotient
+        if(quotient < target) {
+            value = list[quotient.intValueExact()]
+            mutableList.add(value.toString())
+            if(mutableList.last()=="0") {
+                mutableList.removeAt(1)
+            }
+
+            break
+        }
+    }
+    return mutableList.joinToString("").reversed()
+}
+
+fun fromBaseToBigIntegerConvert(_source :String , _processedNumber : String): BigDecimal {
+    val list = mutableListOf<Char>(
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    )
+    val source = _source.toBigDecimal()
+    val processedNumber = _processedNumber.uppercase().reversed()
+    var sum = BigDecimal.ZERO
+
+    var i= 0
+    while (i in processedNumber.indices){
+        val char = processedNumber[i]
+        val valueChar = list.indexOf(char)
+        val to_big_decimal = source.pow(i).multiply(valueChar.toBigDecimal())
+        sum += to_big_decimal
+        if (i == processedNumber.lastIndex) {
+            sum
+            break
+        }
+        i++
+    }
+    /**  for (i in processedNumber.indices) {
+    val char = processedNumber[i]
+    val valueChar = list.indexOf(char)
+    val to_big_decimal = source.pow(i).multiply(valueChar.toBigDecimal())
+    sum += to_big_decimal
+    if (i == processedNumber.lastIndex) {
+
+    println(sum)
+    break
+    }
+    }  */
+
+    return sum
+}
+
+fun fromFractionalToBase (_decimal: String, _base: String): String {
+    val decimal = _decimal
+    val base = _base.toBigDecimal()
+    val listBase = mutableListOf<Char>(
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+        'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    )
+    val denomimatorlist = mutableListOf<String>()
+    var denominator = ("0." + decimal.substringAfter(".")).toBigDecimal()
+    var multiplyD: BigDecimal
+    while (true) {
+        if (denomimatorlist.lastIndex == 4) {
+            break
+        }
+        multiplyD = denominator.multiply(base)
+        denominator = multiplyD.setScale(5, RoundingMode.HALF_UP)
+        if (base == BigDecimal(2) && multiplyD.toDouble() == 1.0) {
+            denomimatorlist.add("1")
+            break
+        }
+        if (multiplyD > BigDecimal(1)) {
+            denomimatorlist.add(listBase[multiplyD.toString().substringBefore(".").toInt()].toString())
+            denominator = ("0." + multiplyD.toString().substringAfter(".")).toBigDecimal()
+            if (multiplyD == BigDecimal(0.0)) {
+                break
+            }
+
+        } else if (multiplyD < BigDecimal(1)) {
+            denomimatorlist.add("0")
+        }
+    }
+
+    return denomimatorlist.joinToString("").padEnd(5, '0')
+
+}
+fun fromFractionalBaseToBigDecimal(_decimal : String, _sourceBase : String ) : String {
+    val decimal = _decimal
+    val sourceBase = _sourceBase.toBigDecimal()
+    val listBase = mutableListOf(
+        '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+    )
+    val fractional = decimal.substringAfter(".").uppercase()
+    var i = BigDecimal(0)
+    var sum = BigDecimal(0)
+    while (true){
+
+        val letterchar=  fractional[i.toInt()]
+        //  println(letterchar)
+        val valueChar = listBase.indexOf(letterchar).toBigDecimal()
+        // println(valueChar)
+        sum += valueChar.multiply((Math.pow(sourceBase.toDouble(), -(i.toDouble()+1.0))).toBigDecimal())
+        //  println(sum)
+        if ( i.toInt() == fractional.lastIndex) {
+            break
+        } else{
+            i++
+        }
+
+
+    }
+    return sum.setScale(5, RoundingMode.HALF_UP).toString()
+}
+
+
+fun converter() {
+    Loop@while (true) {
+        println("Enter two numbers in format: {source base} {target base} (To quit type /exit)")
+        val scanner = Scanner(System.`in`)
+        val input = scanner.nextLine()
+        val source = input.substringBefore(" ")
+        val target = input.substringAfter(" ")
+
+        if(input.equals("/exit")){
+            break
+        } else {
+            while(true) {
+                println("Enter number in base $source to convert to base $target (To go back type /back)")
+                val number = scanner.nextLine()
+                if (number == "/back") {
+                    break
+                }
+                if (number.indexOf('.') == -1) {
+                    val bigDecimal = fromBaseToBigIntegerConvert(source, number).toString()
+                    val resultBigDecimal = fromBigIntegerToBaseConvert(bigDecimal, target)
+                    println("Conversion result: $resultBigDecimal")
+
+
+                } else {
+
+
+                    val subdecimal = number.substringBefore(".")
+                    val subFraction = number.substringAfter(".")
+
+                    val tofractionalbigdecimale = fromFractionalBaseToBigDecimal(subFraction, source)
+                    val resultfractional = fromFractionalToBase(tofractionalbigdecimale, target)
+                    val bigDecimal = fromBaseToBigIntegerConvert(source, subdecimal).toString()
+                    val resultBigDecimal = fromBigIntegerToBaseConvert(bigDecimal, target)
+                    val result = resultBigDecimal+"." +resultfractional
+                    println("Conversion result: $result")
+                    if (number == "/back") {
+                        break
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+
+
+
+fun main() {
+
+    converter()
+
+}
