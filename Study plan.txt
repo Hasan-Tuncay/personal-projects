@@ -1,0 +1,128 @@
+import java.lang.NumberFormatException
+
+fun main() {
+    try {
+        println("Enter the number of rows:")
+        val rows = readln().toInt()
+        println("Enter the number of seats in each row:")
+        val seats = readln().toInt()
+        var plan = MutableList(rows) {
+            MutableList(seats) { "S" }
+        }
+        val size = rows * seats
+        var ticketCounter = 0
+        var currentIncome = 0
+        var priceTicket = 0
+
+
+         Loop@ while (true) {
+              val lisT = plan
+              try {
+
+              println("1. Show the seats\n" +
+                          "2. Buy a ticket\n" +
+                          "3. Statistics\n" +
+                          "0. Exit"
+              )
+                  val input = readln()
+                 // if (!input.equals("0")||!input.equals("1")||!input.equals("2")||!input.equals("3"))
+                     // throw Exception("only number 0 1 2 3 ")
+
+
+
+
+
+                  if (input.equals("0")) {
+                      break@Loop
+                  } else if (input.equals("1")) {
+                      println("Cinema: ")
+                      for (i in 0..1) {
+                          when (i) {
+                              0 -> {
+                                  print("  ")
+                                  for (i in 0..seats - 1) {
+                                      print("${i + 1} ")
+                                  }
+                                  println()
+                              }
+                          }
+                          for (j in 0..rows - 1) {
+                              print("${j + 1} ")
+
+                              for (k in 0..seats - 1) {
+
+                                  print("${lisT[j][k]} ")
+                              }
+                              println()
+
+                          }
+                          break
+                      }
+                  } else if (input.equals("2")) {
+                      Loop@while (true){
+                      println("Enter a row number:")
+                      val rowClient = readln().toInt()
+                      println("Enter a seat number in that row:")
+                      val seatClient = readln().toInt()
+
+                try{if (plan[rowClient-1][seatClient-1]=="B"){
+                    println("That ticket has already been purchased!\n")
+                    continue
+                }}catch ( e:Exception){
+                    println("Wrong input!\n")
+                    continue@Loop
+                }
+
+
+
+                      priceTicket = if (rows * seats > 60) {
+                              if (rowClient <= rows / 2) {
+                                  10
+                              } else {
+                                  8
+                              }
+                          } else {
+                              10
+                          }
+                          println("Ticket price: $$priceTicket\n")
+                          plan[rowClient - 1][seatClient - 1] = "B"
+                          ticketCounter++
+                          currentIncome += priceTicket
+                        break
+                  }
+
+                  } else if (input.equals("3")) {
+                      println("Number of purchased tickets: $ticketCounter")
+
+                      var percentage = 0.0
+                      percentage = (100 * ticketCounter) / size.toDouble()
+                      val formatPercentage = "%.2f".format(percentage)
+
+                      println("Percentage: $formatPercentage%")
+
+                      println("Current income: $$currentIncome")
+                      val totalincome = if (size > 60) {
+                          if (rows % 2 == 0) {
+                              (rows / 2) * seats * 10 + (rows / 2) * 8 * seats
+                          } else {
+                              (rows / 2) * 10 * seats + (rows / 2 + 1) * 8 * seats
+                          }
+                      } else {
+                          size * 10
+                      }
+                      println("Total income: $$totalincome")
+                  }
+
+
+              } catch (e: NumberFormatException) {
+                  println("only number not letter")
+              }
+
+          }
+      }  catch (e: NumberFormatException){
+          println("only number not letter")
+
+      }
+}
+
+
