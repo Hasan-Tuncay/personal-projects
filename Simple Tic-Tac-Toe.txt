@@ -1,0 +1,140 @@
+fun main() {
+    val input = "         "
+    var x = 0
+    var o = 0
+    var trux = 0
+    var alt_ = 0
+    var counter = 0
+    var move = 0
+    val matris = MutableList(3) { MutableList(3) { "" } }
+    for (i in 0..2) {
+        for (j in 0..2) {
+            matris[i][j] = "${input[counter]} "
+            counter++
+        }
+    }
+    for (i in input) {
+        if (i.equals('X')) {
+            x++
+        }
+        if (i.equals('O')) {
+            o++
+        }
+        if (i.equals('_')) {
+            alt_++
+        }
+    }
+    println("---------")
+    for (i in 0..2) {
+        print("| ")
+        for (j in 0..2) {
+
+            print(matris[i][j])
+        }
+        println("|")
+    }
+    print("---------")
+
+     while (true){
+
+
+
+        val r1 = matris[0][0] == matris[0][1] && matris[0][1] == matris[0][2] && !(matris[0][0].equals("  "))
+        val r2 = matris[1][0] == matris[1][1] && matris[1][1] == matris[1][2]&& !(matris[1][1].equals("  "))
+        val r3 = matris[2][0] == matris[2][1] && matris[2][1] == matris[2][2] && !(matris[2][2].equals("  "))
+         val c1 = matris[0][0] == matris[1][0] && matris[1][0] == matris[2][0] && !(matris[0][0].equals("  "))
+        val c2 = matris[0][1] == matris[1][1] && matris[1][1] == matris[2][1]&& !(matris[1][1].equals("  "))
+        val c3 = matris[0][2] == matris[1][2] && matris[1][2] == matris[2][2]&& !(matris[2][2].equals("  "))
+        val d1 = matris[0][0] == matris[1][1] && matris[1][1] == matris[2][2] && !(matris[1][1].equals("  "))
+        val d2 = matris[0][2] == matris[1][1] && matris[1][1] == matris[2][0] && !(matris[1][1].equals("  "))
+
+
+        val checkList = mutableListOf<Boolean>(r1, r2, r3, c1, c2, c3, d1, d2)
+        for (i in checkList) {
+            if (i == true) {
+                trux++
+            }
+        }
+
+        if (trux > 1 || x - o >= 2 || o - x >= 2) {
+            // println("Impossible")
+
+        }
+        if (trux == 1) {
+            if ((r1 || c1) ) {
+               print("${matris[0][0]}wins")
+                break
+
+
+            } else if ((r3 || c3) ) {
+            print("${matris[2][2]}wins")
+                break
+
+
+            } else if ((r2 || c2 || d1 || d2)) {
+              print("${matris[1][1]}wins")
+                break
+
+
+
+            }
+        }
+        if (alt_ > 0 && x + o < 9 && trux == 0 && (trux > 1 || x - o >= 2 || o - x >= 2)) {
+          //  println("Game not finished")
+        }
+        if (trux == 0 && x + o == 9) {
+          println("Draw")
+        }
+
+
+
+        while (true) {
+            println()
+            val coordinate = readln().split(" ")
+
+            try {
+                if (matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] == "X " || matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] == "O ") {
+                    print("This cell is occupied! Choose another one!")
+                } else {
+                    move++
+                    when(move){
+                        1 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "X "
+                        2 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "O "
+                        3 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "X "
+                        4 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "O "
+                        5 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "X "
+                        6 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "O "
+                        7 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "X "
+                        8 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "O "
+                        9 ->  matris[coordinate[0].toInt() - 1][coordinate[1].toInt() - 1] = "X "
+                    }
+
+                    println("---------")
+                    for (i in 0..2) {
+                        print("| ")
+                        for (j in 0..2) {
+
+                            print(matris[i][j])
+                        }
+                        println("|")
+                    }
+                    println("---------")
+
+                    break
+                }
+
+            } catch (e: NumberFormatException) {
+                print("You should enter numbers!")
+            } catch (e: IndexOutOfBoundsException) {
+                print("Coordinates should be from 1 to 3!")
+            }
+
+        }
+
+    }
+
+
+}
+
+
+
