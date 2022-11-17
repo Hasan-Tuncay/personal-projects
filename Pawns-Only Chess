@@ -1,0 +1,379 @@
+package chess
+import java.awt.Label
+fun main() {
+    val chess=Chess1()
+    chess.maint()
+}
+class Chess1() {
+    var playerOne = ""
+    var playerTwo = ""
+    var move = ""
+    var chessBoard = mutableListOf(
+        mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+        mutableListOf("B", "B", "B", "B", "B", "B", "B", "B"),
+        mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+        mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+        mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+        mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+        mutableListOf("W", "W", "W", "W", "W", "W", "W", "W"),
+        mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ")
+    )
+
+    var black =MutableList<Int>(4){0}
+        var white=MutableList<Int>(4){0}
+    var wbcounter=1
+    fun moveTo(_move: String): MutableList<Int> {
+        val move = _move
+        val moveTo = mutableListOf<Char>('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
+        val coordinate = mutableListOf<Int>()
+        for (i in moveTo) {
+            if (i == move[0]) {
+                coordinate.add(8 - move[1].digitToInt())//row
+                coordinate.add(moveTo.indexOf(i))//column
+
+            }
+        }
+        for (i in moveTo) {
+            if (i == move[2]) {
+                coordinate.add(8 - move[3].digitToInt())//row
+                coordinate.add(moveTo.indexOf(i))//column
+
+            }
+
+        }
+
+
+        return coordinate
+    }
+    fun introduction() {
+        println("Pawns-Only Chess")
+        println("First Player's name:")
+        playerOne = readln()
+        println("Second Player's name:")
+        playerTwo = readln()
+        fun chessBoardq() {
+
+            var chessBoard = mutableListOf(
+                mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+                mutableListOf("B", "B", "B", "B", "B", "B", "B", "B"),
+                mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+                mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+                mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+                mutableListOf(" ", " ", " ", " ", " ", " ", " ", " "),
+                mutableListOf("W", "W", "W", "W", "W", "W", "W", "W"),
+                mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ")
+            )
+
+
+
+            for (m in 1 downTo 0) {
+
+                if (m == 0) {
+                    print("  ")
+                    for (n in 'a'..'h') {
+
+                        print("  $n ")
+                    }
+                    println()
+                    if (m == 0) break
+                }
+                print("  ")
+                for (i in 1..9) {
+                    print("+")
+                    for (j in 1..1) {
+                        if (i == 9) {
+                            break
+                        }
+                        print("---")
+                    }
+                }
+                println()
+                for (i in 0..7) {
+                    print("${8 - i}")
+                    for (j in 0..7) {
+                        print(" | ")
+                        print(chessBoard[i][j])
+                    }
+                    println(" |")
+                    print("  ")
+                    for (i in 1..9) {
+                        print("+")
+                        for (j in 1..1) {
+                            if (i == 9) {
+                                break
+                            }
+                            print("---")
+                        }
+                    }
+                    println()
+
+                }
+
+            }
+            println()
+        }
+        chessBoardq()
+    }
+    fun chessBoard(coordinate: MutableList<Int>) {
+        val c = coordinate
+        chessBoard[c[2]][c[3]] = chessBoard[c[0]][c[1]]
+        chessBoard[c[0]][c[1]] = " "
+        for (m in 1 downTo 0) {
+            if (m == 0) {
+                print("  ")
+                for (n in 'a'..'h') {
+
+                    print("  $n ")
+                }
+                println()
+                if (m == 0) break
+            }
+            print("  ")
+            for (i in 1..9) {
+                print("+")
+                for (j in 1..1) {
+                    if (i == 9) {
+                        break
+                    }
+                    print("---")
+                }
+            }
+            println()
+            for (i in 0..7) {
+                print("${8 - i}")
+                for (j in 0..7) {
+                    print(" | ")
+                    print(chessBoard[i][j])
+                }
+                println(" |")
+                print("  ")
+                for (i in 1..9) {
+                    print("+")
+                    for (j in 1..1) {
+                        if (i == 9) {
+                            break
+                        }
+                        print("---")
+                    }
+
+                }
+                println()
+            }
+        }
+        println()
+    }
+
+    fun turn() {
+        val regex = Regex("exit")
+        val movePattern = Regex("[a-h][1-8][a-h][1-8]")
+        var wb = mutableListOf<Int>()
+        outer@ while (true) {
+
+            /*white*/      while (true) {                  //white turn
+                while (true) {
+                    println("$playerOne's turn:")
+                    move = readln().lowercase()
+                    if (regex.matches(move)) {
+                        break@outer
+                    }
+                    if (movePattern.matches(move)) {
+                        break
+                    } else {
+                        println("Invalid Input")
+                    }
+                }
+                if (regex.matches(move)) {
+                    break
+                }
+                if (chessBoard[moveTo(move)[0]][moveTo(move)[1]] != "W")  {
+                    println("No white pawn at ${move[0]}${move[1]}")
+                }
+                if ((chessBoard[moveTo(move)[0]][moveTo(move)[1]] == "W") && (moveTo(move)[0] == 6)&& moveTo(move)[1]==moveTo(move)[3]
+                    && moveTo(move)[0]!=moveTo(move)[2] && moveTo(move)[0] > moveTo(move)[2] &&(chessBoard[moveTo(move)[2]][moveTo(move)[3]] != "B")
+                ) {
+                    if ((moveTo(move)[2] == (moveTo(move)[0]) - 1) ||
+                        (moveTo(move)[2] == (moveTo(move)[0]) - 2)
+                    ) {
+                        chessBoard(moveTo(move))
+                        break
+                    } else(println("Invalid Input"))
+                }else if (chessBoard[moveTo(move)[0]][moveTo(move)[1]] == "W") {
+
+                    if (moveTo(move)[2] == (moveTo(move)[0] - 1) && moveTo(move)[1]==moveTo(move)[3]  &&
+                        moveTo(move)[0]!=moveTo(move)[2]  && moveTo(move)[0] > moveTo(move)[2]
+                        && (chessBoard[moveTo(move)[0]-1][moveTo(move)[1]] != "B") ) {
+                        chessBoard(moveTo(move))
+                        break
+                    } else if (chessBoard[moveTo(move)[2]][moveTo(move)[3]] == "B" && moveTo(move)[2]==moveTo(move)[0]-1
+                        && (moveTo(move)[3] ==moveTo(move)[1]-1 || moveTo(move)[3] ==moveTo(move)[1]+1 )) {
+                        chessBoard(moveTo(move))
+                            break
+                } else if(wbcounter>1) {
+                        if((chessBoard[moveTo(move)[2]][moveTo(move)[3]] != "W" ||chessBoard[moveTo(move)[2]][moveTo(move)[3]] != "B")//hamlenin yapıldığı yerde siyah beyaz olmayacak
+                            && moveTo(move)[2]==moveTo(move)[0]-1 // hamle beyazda bir eksiğe 6 dan 5 e gittimi mesela satırda
+                            && (moveTo(move)[3] ==moveTo(move)[1]-1 || moveTo(move)[3] ==moveTo(move)[1]+1 ) //sütndaçaprazlara gitti mi kontrolü 6-1 5-0 5-2
+                            && ( black[black.lastIndex-1]==black[black.lastIndex-3]+2 ) // son hamle 2 kare mi siyahım 1 1 den 3 1 e mi mesela
+                            &&( moveTo(move)[2] == black[black.lastIndex-1]-1 &&  moveTo(move)[3] == black[black.lastIndex] ) ) {// beyazın hamlesi son oynayan siyahın arkasına mı
+                            chessBoard[moveTo(move)[2]+1].set(moveTo(move)[3]," ")
+                            chessBoard(moveTo(move))
+                            break
+                }   else {
+                            println("Invalid Input")
+                        }
+                }  else {
+                        println("Invalid Input")
+                    }
+                }
+
+
+
+      }
+
+            val checkpawnW= mutableListOf<String>() // hiç aynı renk taş kalmama kontrolü
+            for(i in 0..7){
+                for (j in 0..7){
+                    if(chessBoard[i][j]=="B"){
+                        checkpawnW.add(chessBoard[i][j])
+                    }
+                }
+            }
+            if (checkpawnW.isEmpty()){
+                println("White Wins!")
+                break@outer
+            }
+
+            if (checkpawnW.size==1 ) {
+                for(i in 0..7){
+                    for (j in 0..7){
+                        if (chessBoard[i][j]=="B"){
+                            if (chessBoard[i+1][j]=="W") {
+                                println("Stalemate!")
+                                break@outer
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            if (moveTo(move)[2]==0){  // son kareye ulaşma kontrolü
+                println("White Wins!")
+                break@outer
+            }
+
+
+            white.addAll(moveTo(move))
+
+   /*black*/              while (true) {
+                while (true) {
+                    println("$playerTwo's turn:")
+                    move = readln().lowercase()
+                    if (regex.matches(move)) {
+                        break@outer
+                    }
+                    if (movePattern.matches(move)) {
+                        break
+                    } else {
+                        println("Invalid Input")
+                    }
+                }
+                if (chessBoard[moveTo(move)[0]][moveTo(move)[1]] != "B") {
+                    println("No black pawn at ${move[0]}${move[1]}")
+
+                }
+
+                     if ((chessBoard[moveTo(move)[0]][moveTo(move)[1]] == "B") && (moveTo(move)[0] == 1)&& moveTo(move)[1]==moveTo(move)[3]
+                         && moveTo(move)[0]!=moveTo(move)[2] && moveTo(move)[0] < moveTo(move)[2] &&(chessBoard[moveTo(move)[2]][moveTo(move)[3]] != "W")
+                     ) {
+                         if ((moveTo(move)[2] == (moveTo(move)[0]) + 1) ||
+                             (moveTo(move)[2] == (moveTo(move)[0]) + 2)
+                         ) {
+                             chessBoard(moveTo(move))
+                             break
+                         } else(println("Invalid Input"))
+                     }else if (chessBoard[moveTo(move)[0]][moveTo(move)[1]] == "B") {
+
+                         if (moveTo(move)[2] == (moveTo(move)[0] + 1) && moveTo(move)[1]==moveTo(move)[3]  &&//ikinci hamlenin satırı 1.nin 1 fazlasımı  ve sütunlar eşitmi
+                             moveTo(move)[0]!=moveTo(move)[2]  && moveTo(move)[0] < moveTo(move)[2]  // satırlar aynı olmayacak ikinci hamle birinciden  büyük indeks olacak
+                             && (chessBoard[moveTo(move)[0]+1][moveTo(move)[1]] != "W") ) { //
+                             chessBoard(moveTo(move))
+                             break
+                         } else if (chessBoard[moveTo(move)[2]][moveTo(move)[3]] == "W" && moveTo(move)[2]==moveTo(move)[0]+1
+                             && (moveTo(move)[3] ==moveTo(move)[1]-1 || moveTo(move)[3] ==moveTo(move)[1]+1 )) {
+                             chessBoard(moveTo(move))
+                             break
+                         } else if((chessBoard[moveTo(move)[2]][moveTo(move)[3]] != "W" ||chessBoard[moveTo(move)[2]][moveTo(move)[3]] != "B")
+                        && moveTo(move)[2]==moveTo(move)[0]-1
+                        && (moveTo(move)[3] ==moveTo(move)[1]-1 || moveTo(move)[3] ==moveTo(move)[1]+1 )
+                    && ( white[white.lastIndex-1]==white[white.lastIndex-3]+2 )
+                             &&( moveTo(move)[2] == white[white.lastIndex-1]+1 &&  moveTo(move)[3] == white[white.lastIndex] )
+                     )
+
+                               {
+                        chessBoard[moveTo(move)[2]-1].set(moveTo(move)[3]," ") //siyahın hamlesinin arkasındakini silecem
+                        chessBoard(moveTo(move))
+                        break
+
+                    } else {
+                             println("Invalid Input")
+                         }
+                     }
+   }
+            black.addAll(moveTo(move))
+
+            val checkpawnB= mutableListOf<String>() // hiç aynı renk taş kalmama kontrolü
+            for(i in 0..7){
+                for (j in 0..7){
+                    if(chessBoard[i][j]=="W"){
+                        checkpawnB.add(chessBoard[i][j])
+
+                    }
+                }
+            }
+            if (checkpawnB.size==1 ) {
+                for(i in 0..7){
+                    for (j in 0..7){
+                        if (chessBoard[i][j]=="W"){
+                            if (chessBoard[i+1][j]=="B") {
+                               println("Stalemate!")
+                                break@outer
+                            }
+                        }
+                    }
+                }
+            }
+            if (checkpawnB.isEmpty()){
+                println("Black Wins!")
+                break@outer
+            }
+
+
+
+            if (moveTo(move)[2]==7){ // son kareye ulaşma kontrolü
+                println("Black Wins!")
+                break@outer
+
+            }
+
+
+            wbcounter++
+        }
+    }
+    fun maint() {
+        try {
+            introduction()
+
+
+            turn()
+
+
+        } finally {
+            println("Bye!")
+        }
+
+    }
+
+}
+
+
+
