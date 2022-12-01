@@ -1,0 +1,227 @@
+import java.io.File
+import java.awt.image.BufferedImage
+import java.awt.Color
+import javax.imageio.ImageIO
+import kotlin.experimental.xor
+fun main() {
+    Main().taskInt()
+}
+class Main () {
+    fun taskInt() {
+        while (true)
+        {
+            println("Task (hide, show, exit):")
+            val task = readln()
+            val regex = Regex("hide|show|exit")
+            if (regex.matches(task)) {
+                when (task) {
+                    "hide" -> Hide().hide()
+                    "show" -> Show().show()
+                    "exit" -> {
+                        println("Bye!")
+                        break
+                    }
+
+                }
+            } else {
+                println("Wrong task: $task")
+            }
+        }
+    }
+}
+
+
+class Hide(){
+    fun encyrpt(password: String, message: String):MutableList<Byte>{
+        val password= password.toByteArray()
+        val message = message.toByteArray()
+        val listPassword= mutableListOf<Byte>()
+        val listDecyrpted = mutableListOf<Byte>()
+        val listEncyrpted= mutableListOf<Byte>()
+        if (message.size> password.size){
+            out@  while (true){
+                for (j in password){
+                    listPassword.add(j)
+                    if (message.lastIndex==listPassword.lastIndex){
+                        break@out
+                    }
+                }
+            }
+        } else{
+            for (i in password){
+                listPassword.add(i)
+            }
+        }
+        for(i in 0..message.lastIndex){
+            val c = message[i] xor listPassword[i]
+            listEncyrpted.add(c)
+        }
+        for(i in 0..message.lastIndex){
+            val c = listEncyrpted[i] xor listPassword[i]
+            listDecyrpted.add(c)
+        }
+        return listEncyrpted
+    }
+    fun hide() {
+        println("Input image file:")
+        val imageName = readln()
+        val file = File("$imageName")
+        if (!file.exists()) {
+            println("Can't read input file!")
+            return
+        }
+        println("Output image file:")
+        val outPutImageName = readln()
+        println("Message to hide:")
+        var message = readln()
+        println("Password:")
+        val password  = readln()
+        val listZO = Array<String>(message.length) { "" }
+        var string = ""
+        var byteChar: Byte = 0
+        var index = 0
+        for (i in encyrpt(password, message)) {
+            byteChar = i
+            while (true) {
+                if (byteChar==0.toByte()){
+                    string="00000000"
+                    break
+                } else if (byteChar==1.toByte()){
+                    string="10000000"
+                    break
+                } else  if (byteChar>1){
+                    if (byteChar % 2 == 0) {
+                        string += "0"
+                    } else string += "1"
+                }
+                byteChar = (byteChar / 2).toByte()
+                if (byteChar.toInt() == 1) {
+                    string += "1"
+                    break
+                }
+            }
+            string = string.reversed().padStart(8, '0')
+            listZO[index] = string
+            index++
+            string = ""
+        }
+        val byteList=listZO.joinToString("")+"000000000000000000000011"
+        val inputImage: BufferedImage = ImageIO.read(file)
+        if(byteList.lastIndex>inputImage.width*inputImage.height){
+            println("The input image is not large enough to hold this message.")
+            return
+        }
+        var i = 0
+        for (x in 0 until inputImage.height) { // For every row
+            for (y in 0 until inputImage.width) {// For every column.
+                val color = Color(inputImage.getRGB(y, x))
+                val b = color.blue
+                while (i <= byteList.lastIndex) {
+                    if (byteList[i] == '1') {
+                        val bLSB = b or 1
+                        val colorNew = Color(color.red, color.green, bLSB)
+                        inputImage.setRGB(y, x, colorNew.rgb)
+                        i++
+                        break
+                    } else { if (b and 1 == 0){
+                        val bLSB = b
+                        val colorNew = Color(color.red, color.green, bLSB)
+                        inputImage.setRGB(y, x, colorNew.rgb)
+                        i++
+                        break
+                    } else {
+                        val bLSB = b-1
+                        val colorNew = Color(color.red, color.green, bLSB)
+                        inputImage.setRGB(y,x, colorNew.rgb)
+                        i++
+                        break
+                    }
+                    }
+
+                }
+            }
+        }
+
+
+        val outputFilePng = File("$outPutImageName")  // Output the file
+        ImageIO.write(inputImage, "png", outputFilePng)  // Create an image using the BufferedImage instance data
+
+        println("Message saved in $outPutImageName image.")
+    }
+}
+class Show(){
+    fun show(){
+        var  counter = 0
+        var power= 7.0
+        var charByte= 0
+        val decode= mutableListOf<Int>()
+        var bitCode= mutableListOf<Int>()
+        println("Input image file:")
+        val inputImageName= readln()
+        val file = File("$inputImageName")
+        if (!file.exists()) {
+            println("Can't read input file!")
+            return
+        }
+        println("Password:")
+        val password  = readln().toByteArray()
+        val inputImage: BufferedImage = ImageIO.read(file)
+        val decryptList = mutableListOf<Byte>()
+        val  listPassword= mutableListOf<Byte>()
+        for(i in password){
+            listPassword.add(i)
+        }
+        out@  for (x in 0 until inputImage.height) {
+            for (y in 0 until inputImage.width) {
+                val color = Color(inputImage.getRGB(y, x))
+                val b = color.blue
+                if ((b and 1) == 1){
+                    bitCode.add(1)
+                } else{
+                    bitCode.add(0)
+                }
+
+                charByte += bitCode[counter]* Math.pow(2.0,power).toInt()
+                counter++
+                power--
+
+                if (counter==8){
+                    decode.add(charByte)
+                    charByte=0
+                    bitCode=mutableListOf<Int>()
+                    counter=0
+                    power=7.0
+
+
+                    if (decode.lastIndex>=0) {
+
+                        while (true) {
+                            if (decode.lastIndex > password.lastIndex) {
+                                if (decode.size % password.size == 0) {
+                                    listPassword.add(password.last())                   //   C:\Users\hsn\Desktop\d.png
+                                } else {
+                                    listPassword.add(password[(decode.size % password.size) - 1])
+                                }
+                            }
+
+                            decryptList.add((decode[decode.lastIndex] xor listPassword[decode.lastIndex].toInt()).toByte())
+
+                            if (decode.last()==3  && decode[decode.lastIndex-1 ]==0 &&
+                                decode[decode.lastIndex-2 ]==0 ) {
+                                println("Message:")
+                                for (i in 0..decryptList.lastIndex-3 ) {
+                                    print(decryptList[i].toInt().toChar())
+
+                                }
+                                break@out
+                            }
+                            break
+
+                        }
+                    }
+                }
+            }
+        }
+        println()
+    }
+}
