@@ -1,0 +1,197 @@
+package encryptdecrypt
+
+import java.io.File
+
+
+fun main(args: Array<String>) {
+    val cryptographyFile= CryptographyFile()
+    var data:String=""
+    var key:String=""
+    var mode:String=""
+    var inn= ""            //-mode enc -key 5 -in input.txt -alg shift -out output.txt
+    var out=""
+    var alg=""
+    val argument= mutableListOf<String>()
+    for (i in  args){
+      argument.add(i)
+    }
+    for (i in 0..argument.lastIndex){
+        if(argument[i]=="-mode"){
+            mode= argument[i+1]
+        } else if (argument[i]=="-key")
+        {key= argument[i+1]
+    }else if (argument[i]=="-data"){
+        data= argument[i+1]
+    } else if (argument[i]=="-in"){
+        inn= argument[i+1]
+    } else if(argument[i]=="-out"){
+        out = argument[i+1]
+    } else if (argument[i]=="-alg"){
+        alg = argument[i+1]
+    }
+}
+    if (mode==""){
+        mode="enc"
+    }
+    if (key==""){
+        key="0"
+    }
+    if (data=="" && inn== ""){
+        data==""
+    }
+   if (data!="" && inn!= ""){
+       inn=data
+   }
+
+
+    cryptographyFile.main(mode,key,inn,out,alg)
+
+
+}
+class CryptographyFile {
+    fun main(mode: String, key: String, inn: String, out: String, alg: String) {
+        val outgoing = out
+        val incoming = File(inn)
+        val command = mode
+        val regex = Regex("enc|dec")
+        regex.matches(command)
+        if (regex.matches(command)) {
+            when (command) {
+                "enc" -> encrypt(key, incoming, outgoing,alg)
+                "dec" -> decrypt(key, incoming, outgoing,alg)
+            }
+        } else {
+            println("wrong command please write enc or dec")
+        }
+
+
+    }
+
+         fun encrypt(key: String, incoming: File, outgoing: String, alg: String) {
+        val incoming = incoming
+        val cipherList = mutableListOf<String>()
+
+        if (alg == "unicode") {
+
+            if (outgoing == "") {
+                    for (i in incoming.readText()) {
+                        cipherList.add(((i + key.toInt()).code.toByte()).toString())
+                    }
+                    cipherList.forEach { print(it.toInt().toChar()) }
+                } else {
+                    val outgoing = File("$outgoing")
+
+                    for (i in incoming.readText()) {
+                        cipherList.add((i + key.toInt()).toString())
+                        outgoing.writeText("${cipherList.joinToString("")}")
+
+                    }
+
+                }
+
+                    // 65 90 A Z 97 122 a z
+        } else {
+            if (outgoing == "") {
+
+                for (i in incoming.readText()) {
+                    cipherList.add(
+                        (if (i in 'a'..'z' || i in 'A'..'Z') {
+                            i.code + ('a'.code.toByte() + key.toByte()) % 2
+                        } else {
+                            i.code
+                        }).toChar().toString()
+                    )
+
+                }
+                cipherList.forEach { print(it.toInt().toChar()) }
+
+            } else {
+                val cipherList= mutableListOf<Char>()
+                val outgoing = File("$outgoing")
+                for (i in incoming.readText()) {
+
+                         if (i in 'a'..'z' ) {
+cipherList.add(( 'a'.code + ( i.code+ key.toByte()-'a'.code) % 26).toChar())
+
+                        } else if (i in 'A'..'Z'){
+cipherList.add(('A'.code + ('i'.code + key.toByte()-'A'.code) % 26).toChar())
+
+                        } else{
+
+                             cipherList.add(i)
+
+                        }
+
+
+                }
+                outgoing.writeText("${cipherList.joinToString("")}")
+
+            }
+
+        }
+    }
+
+
+        fun decrypt(key: String, incoming: File, outgoing: String,alg:String) {
+
+            val plainList = mutableListOf<String>()
+            if(alg.equals("unicode")){
+                if (outgoing == "") {
+                    for (i in incoming.readText()) {
+                        plainList.add(((i - key.toInt()).toString()))
+                    }
+                    plainList.forEach { print(it.toInt().toChar()) }
+                } else {
+                    for (i in incoming.readText()) {
+                        plainList.add(((i - key.toInt()).toString()))
+                    }
+                    val outgoing = File("$outgoing")
+
+                    outgoing.writeText("${plainList.joinToString("")}")
+
+                }
+
+            } else{
+               println(incoming.readText())  //girdiyi okuma
+
+                if (outgoing == "") {
+
+                    for (i in incoming.readText()) {
+
+                    }
+                    plainList.forEach { print(it.toInt().toChar()) }
+
+                } else {
+
+                    val outgoing = File("$outgoing")
+                    for (i in incoming.readText()) {
+
+                        if (i in 'a'..'z' ) {
+                     if((i.code-'a'.code) >= key.toInt()){
+                         plainList.add((i.code-key.toInt()).toChar().toString())
+                        }else{
+                            plainList.add(('z'.code.minus (key.toInt()-(i.code-'a'.code))+1).toChar().toString())
+                        }
+
+
+                        } else if (i in 'A'..'Z'){
+                            plainList.add(('A'.code - ('i'.code + key.toByte()-'A'.code) % 26).toChar().toString())
+
+                        } else{
+
+//                            plainList.add(i.toString())
+
+                        }
+
+
+                    }
+                    outgoing.writeText("${plainList.joinToString("")}")
+                  println(outgoing.readText())
+                }
+
+
+            }
+
+
+        }
+    }
