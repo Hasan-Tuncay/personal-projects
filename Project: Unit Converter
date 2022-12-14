@@ -1,0 +1,147 @@
+package converter
+
+enum class Unit(val value : Double, val short :String,val short1 :String, val short2:String,  val single: String , val plural: String,val types: String,val lowcasesingle:String, val lowcaseplural : String){
+    REF(1.0,"???","???","???","???","???" ,"","",""),
+    GRAMS(1.0,"g", "g", "g", "gram", "grams","Weight", "gram", "grams") ,
+    KILOGRAMS( 1000.0, "kg", "kg","kg","kilogram",  "kilograms","Weight","kilogram",  "kilograms",),
+    MILLIGRAMS( 0.001 ,"mg", "mg","mg","milligram",  "milligrams","Weight","milligram",  "milligrams",),
+    POUNDS(453.592,"lb", "lb","lb","pound",  "pounds","Weight","pound",  "pounds",),
+    OUNCES (28.3495,"oz", "oz", "oz", "ounce",  "ounces","Weight","ounce",  "ounces",),
+    METERS(1.0,"m", "m", "m", "meter",  "meters","Length", "meter",  "meters",),
+    KILOMETERS(1000.0,"km", "km","km","kilometer",  "kilometers","Length","kilometer",  "kilometers",),
+    CENTIMETERS(0.01,"cm", "cm","cm","centimeter",  "centimeters","Length","centimeter",  "centimeters",),
+    MILLIMETERS(0.001 ,"mm", "mm","mm","millimeter",  "millimeters","Length","millimeter",  "millimeters",),
+    MILES (1609.35,"mi", "mi","mi","mile",  "miles","Length","mile",  "miles",),
+    YARDS (0.9144,"yd", "yd", "yd", "yard",  "yards","Length","yard",  "yards",),
+    FEET( 0.3048,"ft", "ft","ft","foot",  "feet","Length","foot",  "feet",),
+    INCHES(0.0254,"in", "in","in","inch",  "inches","Length","inch",  "inches",),
+    DEGREES_CELCIUS (0.0,"celsius", "dc", "c","degree Celsius", "degrees Celsius", "tempeture","degree celsius","degrees celsius"),
+    DEGREES_FAHRENHEIT(0.0,"fahrenheit", "df",  "f","degree Fahrenheit", "degrees Fahrenheit", "tempeture","degree fahrenheit","degree celsius"),
+    KELVINS(0.0,"k","k","k", "kelvin", "kelvins",  "tempeture","k","k");
+}
+
+fun main() {
+    while (true){
+            try {
+                println("Enter what you want to convert (or exit): ")
+                val input = readln().split(" ")
+                if (input[0]=="exit" ) break
+                var fromValue = Unit.REF
+                var toValue = Unit.REF
+                var inputValueType=""
+                var inputOutType=""
+                if ((input[1].lowercase()=="degree" || input[1].lowercase()=="degrees" )&&
+                    (input[4].lowercase()=="degree" || input[4].lowercase()=="degrees")){
+                    inputValueType= input[2].lowercase()
+                    inputOutType = input[5].lowercase()
+                } else if((input[1].lowercase()=="degree" || input[1].lowercase()=="degrees" ) &&
+                    (input[4].lowercase()!="degree" || input[4].lowercase()!="degrees")) {
+                    inputValueType= input[2].lowercase()
+                    inputOutType = input[4].lowercase()
+                } else if (input[3].lowercase()=="degree" || input[3].lowercase()=="degrees"){
+                    inputValueType = input[1].lowercase()
+                    inputOutType = input[4].lowercase()
+                } else {
+                    inputValueType = input[1].lowercase()
+                    inputOutType = input[3].lowercase()
+                }
+
+                for(i in Unit.values()){
+                    if (inputValueType in listOf(i.short,i.plural,i.single)){ fromValue = i }
+                    if ( inputOutType in listOf(i.short,i.plural,i.single)) {  toValue = i }
+                }
+                if (inputValueType in listOf(fromValue.single,fromValue.short,fromValue.plural) &&
+                    inputOutType in listOf(toValue.single,toValue.short,toValue.plural)  &&
+                    fromValue.types == toValue.types && fromValue.types!="tempeture" && toValue.types!="tempeture"
+                ) {
+                    if (input[0].toDouble()<0.0){
+                        println("${fromValue.types} shouldn't be negative")
+                    } else{
+                        val convert = input[0].toDouble()*fromValue.value/ toValue.value
+                        print("${input[0].toDouble()} ${if (input[0].toDouble()==1.0) fromValue.single else fromValue.plural} is ")
+                        print("$convert ${if (convert==1.0) toValue.single else toValue.plural}\n")
+                    }
+
+                } else if(true){
+
+                    val inDegree= input[0].toDouble()
+                    for(i in Unit.values()) {
+
+                        if (inputValueType in listOf(i.short, i.plural, i.single, i.short1, i.short2)) {
+                            fromValue = i
+                        }
+                        if (inputOutType in listOf(i.short, i.plural, i.single, i.short1, i.short2)) {
+                            toValue = i
+                        }
+                    }
+                    if (inputValueType in listOf(fromValue.single,fromValue.short,fromValue.plural,fromValue.short1,fromValue.short2) &&
+                        inputOutType in listOf(toValue.single,toValue.short,toValue.plural,toValue.short1,toValue.short2) &&
+                        toValue.types==fromValue.types){
+                        var convert = 0.0
+                        if (fromValue.name=="DEGREES_CELCIUS" && toValue.name=="DEGREES_FAHRENHEIT"){
+                            convert = inDegree * 9/5 + 32
+                        } else if (fromValue.name=="DEGREES_CELCIUS" && toValue.name=="KELVINS"){
+                            convert = inDegree + 273.15
+                        } else if(fromValue.name=="DEGREES_FAHRENHEIT" && toValue.name=="KELVINS"){
+                            convert =(inDegree + 459.67) * 5/9
+                        } else if(fromValue.name=="DEGREES_FAHRENHEIT" && toValue.name=="DEGREES_CELCIUS"){
+                            convert = (inDegree - 32) * 5/9
+                        } else if(fromValue.name=="KELVINS" && toValue.name=="DEGREES_CELCIUS"){
+                            convert=inDegree - 273.15
+                        } else if (fromValue.name=="KELVINS" && toValue.name=="DEGREES_FAHRENHEIT"){
+                            convert= inDegree * 9/5 - 459.67
+                        } else if(fromValue.name==toValue.name){
+                            convert=inDegree
+                        }
+                        println("$inDegree ${if (inDegree==1.0) fromValue.single else fromValue.plural} is $convert ${if (convert==1.0) toValue.single else toValue.plural}")
+                    } else { println("Conversion from ${fromValue.plural} to ${toValue.plural} is impossible")}
+
+                }
+            }  catch (e : Exception){
+                println("Parse error\n")
+
+            }
+
+        }
+}
+/**
+ * Enter what you want to convert (or exit): 1 kg to ounces
+1.0 kilogram is 35.27399072294044 ounces
+
+Enter what you want to convert (or exit): 2 meters in yards
+2.0 meters is 2.1872265966754156 yards
+
+Enter what you want to convert (or exit): 1 pound in kg
+1.0 pound is 0.453592 kilograms
+
+Enter what you want to convert (or exit): exit
+Example 2:
+
+Enter what you want to convert (or exit): 1 oz to g
+1.0 ounce is 28.3495 grams
+
+Enter what you want to convert (or exit): 100 cm in meters
+100.0 centimeters is 1.0 meter
+
+Enter what you want to convert (or exit): 23.34 feet to in
+23.34 feet is 280.08 inches
+
+Enter what you want to convert (or exit): exit
+Example 3:
+
+Enter what you want to convert (or exit): 1 kn to feet
+Conversion from ??? to feet is impossible
+
+Enter what you want to convert (or exit): 3 grams to meters
+Conversion from grams to meters is impossible
+
+Enter what you want to convert (or exit): exit
+Example 4:
+
+Enter what you want to convert (or exit): 1 PouNd to feet
+Conversion from pounds to feet is impossible
+
+Enter what you want to convert (or exit): 100 CM in KM
+100 centimeters is 0,001 kilometers
+
+Enter what you want to convert (or exit): exit*/
